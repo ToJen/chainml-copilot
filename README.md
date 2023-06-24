@@ -21,5 +21,5 @@ Our ETHWaterloo 2023 hackathon project is an AI agent that simplifies user onboa
 
 ## Usage
 
-- `$ python dep_notebook.py`
+- `$ python model_server.py`
 
