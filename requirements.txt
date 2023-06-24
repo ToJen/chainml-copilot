@@ -1,0 +1,10 @@
+openai
+chromadb
+sentence_transformers
+GoogleNews
+google-api-python-client
+Wikipedia-API
+python-dotenv
+langchain
+tiktoken
+pypdf

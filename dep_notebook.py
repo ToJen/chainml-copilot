@@ -174,9 +174,9 @@ def create_dataset(pdf_files,
 
 uni_files = [
     {
-        "path": "data/uni_sample_doc.pdf",
+        "path": "data/uniswap_docs_pdf_combined.pdf",
         "lower_page_num": 0,
-        "upper_page_num": 30
+        "upper_page_num": 1036
     }
 ]
 
@@ -886,7 +886,6 @@ print(fact_checking_response)
 ### Bring everything together so that we can build a single interface for the end user, so we can go directly from
 ### user message to a fact-checked response.
 
-# def financial_analyst_chain(user_message, verbose=False):
 def web3_devrel_chain(user_message, verbose=False):
 
   # The User's message to the AI system
@@ -917,13 +916,13 @@ def web3_devrel_chain(user_message, verbose=False):
     pprint(context)
     print()
 
-  # Apply the Analyst prompt template to build the Analyst message
+  # Apply the Web3 DevRel prompt template to build the Web3 DevRel message
   web3_devrel_message = web3_devrel_prompt_template.substitute(
       user_message=user_message,
       context=context
   )
 
-  # Get the Analyst's response
+  # Get the Web3 DevRel's response
   web3_devrel_response = get_completion(web3_devrel_message, web3_devrel_system_prompt, model='gpt-4')
   if verbose:
     pprint(f"Web3 DevRel's Response:\n{web3_devrel_response}")
@@ -940,24 +939,24 @@ def web3_devrel_chain(user_message, verbose=False):
       "selected_skill": skill,
       "generated_query": query,
       "retrieved_context": context,
-      "analyst_response": web3_devrel_response,
+      "web3_devrel_response": web3_devrel_response,
       "fact_checking_response": fact_checking_response,
       "fact_check_passed": True if fact_checking_response.split()[-1] == 'True' else False
   }
 
 
 user_message = "How do I connect to Uniswap?"
-analyst_output = web3_devrel_chain(user_message, verbose=True)
+web3_devrel_output = web3_devrel_chain(user_message, verbose=True)
 
 def self_assessed_web3_devrel(user_message, verbose=False):
-  analyst_output = web3_devrel_chain(user_message, verbose=verbose)
-  print(f"{analyst_output['user_message']}\n")
-  if analyst_output['fact_check_passed']:
+  web3_devrel_output = web3_devrel_chain(user_message, verbose=verbose)
+  print(f"{web3_devrel_output['user_message']}\n")
+  if web3_devrel_output['fact_check_passed']:
     print("NOTICE: While automated fact-checking was successful, the factual accuracy of AI-generated responses is not guaranteed.\n")
-    pprint(analyst_output['analyst_response'])
+    pprint(web3_devrel_output['web3_devrel_response'])
   else:
     print("WARNING: Supporting evidence was not found, please interpret with caution.\n")
-    pprint(analyst_output['analyst_response'])
+    pprint(web3_devrel_output['web3_devrel_response'])
 
 """## (24) Testing with additional user messages"""
 
@@ -990,5 +989,5 @@ print(fact_checking_response)
 
 """### More Queries"""
 
-# self_assessed_analyst("What does RBC have to say about the housing market?", verbose=True)
+self_assessed_web3_devrel("What is the Uniswap Router about?", verbose=True)
 
