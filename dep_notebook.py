@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Modified https://github.com/chain-ml/tmls-2023-material/blob/main/ChainML_TMLS2023.ipynb
+"""
 
 """### Import dependencies"""
 
@@ -229,7 +232,7 @@ def populate_db(db_collection,
 
 
 # Populate database with Uniswap documents
-populate_db(uni_collection, uni_data, embedding_model, batch_size)
+# populate_db(uni_collection, uni_data, embedding_model, batch_size)
 print(len(uni_data))
 print(uni_collection.count())
 
@@ -412,9 +415,9 @@ def google_news_skill(query):
 
 """### (15) Skill Testing Questions"""
 
-print(google_news_skill("how do i connect to uniswap?"))
+# print(google_news_skill("how do i connect to uniswap?"))
 
-print(uni_docs_skill("how do i connect to uniswap?"))
+# print(uni_docs_skill("how do i connect to uniswap?"))
 
 """# Using GPT-4 For Skill Selection
 
@@ -473,11 +476,11 @@ Response:
 
 # Preview the prompt after filling in variables
 
-print(controller_prompt_template.substitute(
-    chains=chains,
-    few_shot_examples = few_shot_examples,
-    user_message=''
-))
+# print(controller_prompt_template.substitute(
+#     chains=chains,
+#     few_shot_examples = few_shot_examples,
+#     user_message=''
+# ))
 
 """## Controller Test Run"""
 
@@ -756,8 +759,8 @@ def retrieve_fact_docs(
 
 fact_documents = retrieve_fact_docs(queries)
 
-# Print an example
-pprint(fact_documents[0])
+# # Print an example
+# pprint(fact_documents[0])
 
 """## Find The Most Related Search Results
 
@@ -782,9 +785,9 @@ def extract_most_relevant_fact_passage(test_response, fact_documents, max_passag
     client.delete_collection("FEC")
     return relevant_fact_passage
 
-relevant_fact_passages = extract_most_relevant_fact_passage(response, fact_documents)
+# relevant_fact_passages = extract_most_relevant_fact_passage(response, fact_documents)
 
-print(relevant_fact_passages)
+# print(relevant_fact_passages)
 
 """## (22) Use an Evaluator Agent to Perform Fact Checking
 
@@ -832,13 +835,13 @@ def evaluate_fact(user_message, context, relevant_fact_passage, ai_response):
     fc_compare_response = get_completion(message, fc_system_prompt)
     return fc_compare_response.strip()
 
-response
+# response
 
-context
+# context
 
-relevant_fact_passages
+# relevant_fact_passages
 
-print(evaluate_fact(user_message, context, relevant_fact_passages, response))
+# print(evaluate_fact(user_message, context, relevant_fact_passages, response))
 
 """## Fact-Checking Test Run"""
 
@@ -848,11 +851,11 @@ def run_fact_check(user_message, context, ai_response):
   relevant_fact_passage = extract_most_relevant_fact_passage(ai_response, fact_documents)
   return evaluate_fact(user_message, context, relevant_fact_passage, ai_response)
 
-response
+# response
 
-fact_checking_response = run_fact_check(user_message, context, response)
+# fact_checking_response = run_fact_check(user_message, context, response)
 
-print(fact_checking_response)
+# print(fact_checking_response)
 
 """# Building An End-To-End Assistant
 
@@ -921,8 +924,8 @@ def web3_devrel_chain(user_message, verbose=False):
   }
 
 
-user_message = "How do I connect to Uniswap?"
-web3_devrel_output = web3_devrel_chain(user_message, verbose=True)
+# user_message = "How do I connect to Uniswap?"
+# web3_devrel_output = web3_devrel_chain(user_message, verbose=True)
 
 def self_assessed_web3_devrel(user_message, verbose=False):
   web3_devrel_output = web3_devrel_chain(user_message, verbose=verbose)
@@ -937,33 +940,66 @@ def self_assessed_web3_devrel(user_message, verbose=False):
 """## (24) Testing with additional user messages"""
 
 
-self_assessed_web3_devrel("How do i connect to uniswap?", verbose=False)
+# self_assessed_web3_devrel("How do i connect to uniswap?", verbose=False)
 
 """# Comparing with Vanilla GPT-4 Response"""
 
-vanilla_response = """
-To connect to Uniswap, you will need to follow these steps:
+# vanilla_response = """
+# To connect to Uniswap, you will need to follow these steps:
+#
+# 1. Set up a Web3-enabled wallet: Uniswap is built on the Ethereum blockchain, so you'll need a Web3-enabled wallet to interact with it. Popular options include MetaMask (a browser extension) and Trust Wallet (a mobile app). Install the wallet of your choice and create a new Ethereum wallet if you don't have one already. Be sure to securely back up your wallet's recovery phrase or private key.
+#
+# 2. Fund your wallet with Ethereum (ETH): Uniswap operates on the Ethereum network, so you'll need some ETH to pay for transaction fees and interact with the platform. Purchase ETH from a reputable exchange and transfer it to your wallet address.
+#
+# 3. Access the Uniswap interface: Visit the Uniswap website at https://app.uniswap.org/. Ensure that you are on the correct website and exercise caution to avoid phishing attempts. You can also use alternative interfaces like Uniswap.info or UniswapV2, but the official Uniswap interface is recommended.
+#
+# 4. Connect your wallet: On the Uniswap interface, locate the "Connect Wallet" or similar button. Click on it, and it will prompt you to connect your wallet. If you're using MetaMask or Trust Wallet, a pop-up window should appear automatically, requesting permission to connect.
+#
+# 5. Confirm connection and permissions: After clicking on the connect button, you'll likely see a pop-up or prompt from your wallet. Review the permissions requested by the Uniswap interface (such as access to your wallet address and balances) and approve them. This step allows the Uniswap interface to interact with your wallet on your behalf.
+# 
+# 6. Interact with Uniswap: Once your wallet is successfully connected, you can begin using Uniswap. You can swap tokens, provide liquidity to pools, or participate in other features offered by the protocol. Explore the different options available on the interface, and ensure you understand the risks and mechanics of the transactions you wish to perform.
+#
+# Remember to exercise caution when interacting with decentralized platforms like Uniswap. Verify the URLs and interfaces to avoid phishing attempts, and be mindful of the assets you're interacting with. It's also a good practice to start with smaller transactions until you are comfortable with the process.
+# """
 
-1. Set up a Web3-enabled wallet: Uniswap is built on the Ethereum blockchain, so you'll need a Web3-enabled wallet to interact with it. Popular options include MetaMask (a browser extension) and Trust Wallet (a mobile app). Install the wallet of your choice and create a new Ethereum wallet if you don't have one already. Be sure to securely back up your wallet's recovery phrase or private key.
-
-2. Fund your wallet with Ethereum (ETH): Uniswap operates on the Ethereum network, so you'll need some ETH to pay for transaction fees and interact with the platform. Purchase ETH from a reputable exchange and transfer it to your wallet address.
-
-3. Access the Uniswap interface: Visit the Uniswap website at https://app.uniswap.org/. Ensure that you are on the correct website and exercise caution to avoid phishing attempts. You can also use alternative interfaces like Uniswap.info or UniswapV2, but the official Uniswap interface is recommended.
-
-4. Connect your wallet: On the Uniswap interface, locate the "Connect Wallet" or similar button. Click on it, and it will prompt you to connect your wallet. If you're using MetaMask or Trust Wallet, a pop-up window should appear automatically, requesting permission to connect.
-
-5. Confirm connection and permissions: After clicking on the connect button, you'll likely see a pop-up or prompt from your wallet. Review the permissions requested by the Uniswap interface (such as access to your wallet address and balances) and approve them. This step allows the Uniswap interface to interact with your wallet on your behalf.
-
-6. Interact with Uniswap: Once your wallet is successfully connected, you can begin using Uniswap. You can swap tokens, provide liquidity to pools, or participate in other features offered by the protocol. Explore the different options available on the interface, and ensure you understand the risks and mechanics of the transactions you wish to perform.
-
-Remember to exercise caution when interacting with decentralized platforms like Uniswap. Verify the URLs and interfaces to avoid phishing attempts, and be mindful of the assets you're interacting with. It's also a good practice to start with smaller transactions until you are comfortable with the process.
-"""
-
-message = "How do I connect to Uniswap?"
-fact_checking_response = run_fact_check(message, context='', ai_response=vanilla_response)
-print(fact_checking_response)
+# message = "How do I connect to Uniswap?"
+# fact_checking_response = run_fact_check(message, context='', ai_response=vanilla_response)
+# print(fact_checking_response)
 
 """### More Queries"""
 
-self_assessed_web3_devrel("What is the Uniswap Router about?", verbose=True)
+# self_assessed_web3_devrel("What is the Uniswap Router about?", verbose=True)
+
+"""
+FLASK SERVER
+"""
+
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello_world():
+    return "<p>Hello, World!</p>"
+
+"""
+{
+    "user": ...,
+    "prompt": "...",
+    "timestamp": ...
+}
+"""
+@app.route("/chat", methods=["POST"])
+def chat():
+    req_data = request.get_json()
+
+    prompt = req_data["prompt"]
+    print(prompt)
+
+    bot_response = web3_devrel_chain(prompt, verbose=False)
+    print(bot_response)
+
+    return bot_response
+
+app.run(port=5555, debug=True)
 
