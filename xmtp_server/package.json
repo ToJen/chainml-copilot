@@ -1,0 +1,17 @@
+{
+  "name": "chainml_copilot_xmtp_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@xmtp/bot-starter": "^1.0.3",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.6.1"
+  }
+}

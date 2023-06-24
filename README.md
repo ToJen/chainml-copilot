@@ -10,6 +10,8 @@ Our ETHWaterloo 2023 hackathon project is an AI agent that simplifies user onboa
 
 ## Setup
 
+### Model Server
+
 - `$ pip3 install -r requirements.txt`
 - Create a new file called *config.env*
     - Copy the contents of *config.env.example* into your new *config.env* file
