@@ -151,6 +151,7 @@ def create_dataset(pdf_files,
         for doc in chunked_documents:
             f.write(json.dumps(doc) + '\n')
 
+# Uniswap
 uni_files = [
     {
         "path": "data/uniswap_docs.pdf",
@@ -158,13 +159,10 @@ uni_files = [
         "upper_page_num": 1036
     }
 ]
-
 UNI_DATA_PATH = "data/uni_dataset.jsonl"
-
-
-# Create Uniswap dataset
 create_dataset(uni_files, UNI_DATA_PATH)
 
+# Compound
 comp_files = [
     {
         "path": "data/compound_docs.pdf",
@@ -172,13 +170,10 @@ comp_files = [
         "upper_page_num": 96
     }
 ]
-
 COMP_DATA_PATH = "data/comp_dataset.jsonl"
-
-
-# Create Compound dataset
 create_dataset(comp_files, COMP_DATA_PATH)
 
+# Delv's Council
 delv_files = [
     {
         "path": "data/delv_council_docs.pdf",
@@ -186,12 +181,19 @@ delv_files = [
         "upper_page_num": 109
     }
 ]
-
 DELV_DATA_PATH = "data/delv_dataset.jsonl"
-
-
-# Create Delv Council dataset
 create_dataset(delv_files, DELV_DATA_PATH)
+
+# ERC6551
+erc6551_files = [
+    {
+        "path": "data/erc6551_docs.pdf",
+        "lower_page_num": 0,
+        "upper_page_num": 13
+    }
+]
+ERC6551_DATA_PATH = "data/erc6551_dataset.jsonl"
+create_dataset(erc6551_files, ERC6551_DATA_PATH)
 
 """## Creating a database of text embeddings
 
@@ -225,6 +227,11 @@ with open('data/delv_dataset.jsonl', 'r') as f:
     for line in f:
         delv_data.append(json.loads(line))
 
+erc6551_data = []
+with open('data/erc6551_dataset.jsonl', 'r') as f:
+    for line in f:
+        erc6551_data.append(json.loads(line))
+
 
 client = chromadb.Client(Settings(
     chroma_db_impl="duckdb+parquet",
@@ -235,6 +242,7 @@ client = chromadb.Client(Settings(
 uni_collection = client.get_or_create_collection("UNI", metadata={"hnsw:space": "cosine"})
 comp_collection = client.get_or_create_collection("COMP", metadata={"hnsw:space": "cosine"})
 delv_collection = client.get_or_create_collection("DELV", metadata={"hnsw:space": "cosine"})
+erc6551_collection = client.get_or_create_collection("ERC6551", metadata={"hnsw:space": "cosine"})
 
 batch_size = 128
 
@@ -289,6 +297,11 @@ This step need only be run once
 # populate_db(delv_collection, delv_data, embedding_model, batch_size)
 # print(len(delv_data))
 # print(delv_collection.count())
+
+# # Populate database with ERC6551 documents
+# populate_db(erc6551_collection, erc6551_data, embedding_model, batch_size)
+# print(len(erc6551_data))
+# print(erc6551_collection.count())
 
 # Persist database to disk
 client.persist()
@@ -477,6 +490,15 @@ def delv_docs_skill(query):
                           num_ranked_docs=NUM_RANKED_DOCS,
                           token_limit=CONTEXT_TOKEN_LIMIT)
 
+def erc6551_docs_skill(query):
+
+    """Skill to create a context for the LLM by retrieving relevant documents from the ERC6551 document database"""
+    return query_database(collection=erc6551_collection,
+                          query=query,
+                          num_retrieved_docs=NUM_RETRIEVED_DB_DOCS,
+                          num_ranked_docs=NUM_RANKED_DOCS,
+                          token_limit=CONTEXT_TOKEN_LIMIT)
+
 def google_news_skill(query):
 
     """Skill to create a context for the LLM by retrieving relevant news articles from Google News"""
@@ -493,8 +515,11 @@ def google_news_skill(query):
 # print(google_news_skill("how does the Bridge Receiver work on compound?"))
 # print(comp_docs_skill("how does the Bridge Receiver work on compound?"))
 
-print(google_news_skill("how do i vote on Council?"))
-print(delv_docs_skill("how do i vote on Council?"))
+# print(google_news_skill("how do i vote on Council?"))
+# print(delv_docs_skill("how do i vote on Council?"))
+
+print(google_news_skill("how is erc6551 different from a regular NFT?"))
+print(erc6551_docs_skill("how is erc6551 different from a regular NFT?"))
 
 """# Using GPT-4 For Skill Selection
 
@@ -539,6 +564,7 @@ chains = {
     "uni_docs": "Retrieve information from Uniswap's official documentation that contains important information about how Uniswap works and how it can be used.",
     "comp_docs": "Retrieve information from Compound's official documentation that contains important information about how Compound works and how it can be used.",
     "delv_docs": "Retrieve information from Delv Council's official documentation that contains important information about how Delv Council works and how it can be used.",
+    "erc6551_docs": "Retrieve information from ERC6551's official documentation that contains important information about how ERC6551 works and how it can be used.",
     "google_news_search": "Search Google News for recent information related to the user message. Be sure to mention the relevant company name in the reformulated search query."
 }
 
@@ -566,6 +592,14 @@ Does Delv's Council use the contract factory design pattern?
 Response:
 1;delv_docs;factory contract
 2;google_news_search;Delv's council factory contract
+""",
+"""
+User message:
+Does ERC6551 use the contract factory design pattern?
+
+Response:
+1;erc6551_docs;factory contract
+2;google_news_search;ERC6551 factory contract
 """
 ])
 
@@ -609,6 +643,7 @@ skills_map = {
     "uni_docs": uni_docs_skill,
     "comp_docs": comp_docs_skill,
     "delv_docs": delv_docs_skill,
+    "erc6551_docs": erc6551_docs_skill,
     "google_news_search": google_news_skill
 }
 
@@ -1069,7 +1104,8 @@ def self_assessed_web3_devrel(user_message, verbose=False):
 
 # self_assessed_web3_devrel("What is the Uniswap Router about?", verbose=True)
 # self_assessed_web3_devrel("When is an account elligible for liquidation on Compound?", verbose=True)
-self_assessed_web3_devrel("How do I deploy council governance contracts?", verbose=True)
+# self_assessed_web3_devrel("How do I deploy council governance contracts?", verbose=True)
+self_assessed_web3_devrel("Summarise the ERC6551 proposal", verbose=True)
 
 """
 FLASK SERVER
@@ -1085,9 +1121,7 @@ def hello_world():
 
 """
 {
-    "user": ...,
-    "prompt": "...",
-    "timestamp": ...
+    "prompt": "..."
 }
 """
 @app.route("/chat", methods=["POST"])
