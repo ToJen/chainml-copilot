@@ -1027,7 +1027,7 @@ def web3_devrel_chain(user_message, verbose=False):
   if verbose:
     print("Retrieved Contextual Information")
     pprint(context)
-    print()
+    # print()
 
   # Apply the Web3 DevRel prompt template to build the Web3 DevRel message
   web3_devrel_message = web3_devrel_prompt_template.substitute(
