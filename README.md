@@ -25,9 +25,10 @@ Our ETHWaterloo 2023 hackathon project is an AI agent that simplifies user onboa
 
 - `$ python model_server.py`
 
-# Extending
+# Adding more docs from web3 projects
 
-- Scrape and download site: `$ wget --limit-rate=200k --no-clobber --convert-links --random-wait -r -p -E -e robots=off -U mozilla http://www.SOME_WEBSITE.com`
+- Scrape and download the project's entire documentation site: `$ wget --limit-rate=200k --no-clobber --convert-links --random-wait -r -p -E -e robots=off -U mozilla http://www.SOME_WEBSITE.com`
 - Make a copy of the newly created *www.SOME_WEBSITE.com/* directory (likely deeply nested): `$ cp -R www.SOME_WEBSITE.com temp_copy_SOME_WEBSITE`
 - Flatten the cloned directory to one level: `$ find . -mindepth 2 -type f -exec mv -if '{}' . ';'`
+- Convert all to a single PDF
 - 

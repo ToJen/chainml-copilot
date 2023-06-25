@@ -179,6 +179,20 @@ COMP_DATA_PATH = "data/comp_dataset.jsonl"
 # Create Compound dataset
 create_dataset(comp_files, COMP_DATA_PATH)
 
+delv_files = [
+    {
+        "path": "data/delv_council_docs.pdf",
+        "lower_page_num": 0,
+        "upper_page_num": 109
+    }
+]
+
+DELV_DATA_PATH = "data/delv_dataset.jsonl"
+
+
+# Create Delv Council dataset
+create_dataset(delv_files, DELV_DATA_PATH)
+
 """## Creating a database of text embeddings
 
 We are using Chroma, an open-source database purpose built for AI embedding vectors and operations. This allows us to build a prototype embedding database that can scale to a far greater number of source documents.
@@ -206,6 +220,12 @@ with open('data/comp_dataset.jsonl', 'r') as f:
     for line in f:
         comp_data.append(json.loads(line))
 
+delv_data = []
+with open('data/delv_dataset.jsonl', 'r') as f:
+    for line in f:
+        delv_data.append(json.loads(line))
+
+
 client = chromadb.Client(Settings(
     chroma_db_impl="duckdb+parquet",
     persist_directory=".chromadb/"
@@ -214,6 +234,7 @@ client = chromadb.Client(Settings(
 
 uni_collection = client.get_or_create_collection("UNI", metadata={"hnsw:space": "cosine"})
 comp_collection = client.get_or_create_collection("COMP", metadata={"hnsw:space": "cosine"})
+delv_collection = client.get_or_create_collection("DELV", metadata={"hnsw:space": "cosine"})
 
 batch_size = 128
 
@@ -263,6 +284,11 @@ This step need only be run once
 # populate_db(comp_collection, comp_data, embedding_model, batch_size)
 # print(len(comp_data))
 # print(comp_collection.count())
+
+# # Populate database with Delv's Council documents
+# populate_db(delv_collection, delv_data, embedding_model, batch_size)
+# print(len(delv_data))
+# print(delv_collection.count())
 
 # Persist database to disk
 client.persist()
@@ -442,6 +468,15 @@ def comp_docs_skill(query):
                           num_ranked_docs=NUM_RANKED_DOCS,
                           token_limit=CONTEXT_TOKEN_LIMIT)
 
+def delv_docs_skill(query):
+
+    """Skill to create a context for the LLM by retrieving relevant documents from Delv's Council document database"""
+    return query_database(collection=delv_collection,
+                          query=query,
+                          num_retrieved_docs=NUM_RETRIEVED_DB_DOCS,
+                          num_ranked_docs=NUM_RANKED_DOCS,
+                          token_limit=CONTEXT_TOKEN_LIMIT)
+
 def google_news_skill(query):
 
     """Skill to create a context for the LLM by retrieving relevant news articles from Google News"""
@@ -455,8 +490,11 @@ def google_news_skill(query):
 # print(google_news_skill("how do i connect to uniswap?"))
 # print(uni_docs_skill("how do i connect to uniswap?"))
 
-print(google_news_skill("how does the Bridge Receiver work on compound?"))
-print(comp_docs_skill("how does the Bridge Receiver work on compound?"))
+# print(google_news_skill("how does the Bridge Receiver work on compound?"))
+# print(comp_docs_skill("how does the Bridge Receiver work on compound?"))
+
+print(google_news_skill("how do i vote on Council?"))
+print(delv_docs_skill("how do i vote on Council?"))
 
 """# Using GPT-4 For Skill Selection
 
@@ -500,6 +538,7 @@ Response:
 chains = {
     "uni_docs": "Retrieve information from Uniswap's official documentation that contains important information about how Uniswap works and how it can be used.",
     "comp_docs": "Retrieve information from Compound's official documentation that contains important information about how Compound works and how it can be used.",
+    "delv_docs": "Retrieve information from Delv Council's official documentation that contains important information about how Delv Council works and how it can be used.",
     "google_news_search": "Search Google News for recent information related to the user message. Be sure to mention the relevant company name in the reformulated search query."
 }
 
@@ -519,6 +558,14 @@ Does Compound use the contract factory design pattern?
 Response:
 1;comp_docs;factory contract
 2;google_news_search;Compound Finance factory contract
+""",
+"""
+User message:
+Does Delv's Council use the contract factory design pattern?
+
+Response:
+1;delv_docs;factory contract
+2;google_news_search;Delv's council factory contract
 """
 ])
 
@@ -535,7 +582,8 @@ print(controller_prompt_template.substitute(
 # Use GPT to generate a response to the control request
 
 # user_message = "How do I connect to Uniswap"
-user_message = "How do I add collateral on Compound"
+# user_message = "How do I add collateral on Compound"
+user_message = "How do I interact with council contracts"
 
 message = controller_prompt_template.substitute(
     chains=chains,
@@ -560,6 +608,7 @@ def parse_top_response(response):
 skills_map = {
     "uni_docs": uni_docs_skill,
     "comp_docs": comp_docs_skill,
+    "delv_docs": delv_docs_skill,
     "google_news_search": google_news_skill
 }
 
@@ -1019,7 +1068,8 @@ def self_assessed_web3_devrel(user_message, verbose=False):
 """### More Queries"""
 
 # self_assessed_web3_devrel("What is the Uniswap Router about?", verbose=True)
-self_assessed_web3_devrel("When is an account elligible for liquidation on Compound?", verbose=True)
+# self_assessed_web3_devrel("When is an account elligible for liquidation on Compound?", verbose=True)
+self_assessed_web3_devrel("How do I deploy council governance contracts?", verbose=True)
 
 """
 FLASK SERVER
